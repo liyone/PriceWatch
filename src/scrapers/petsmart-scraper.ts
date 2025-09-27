@@ -363,26 +363,35 @@ export class PetSmartScraper extends BaseScraper {
           return '$24.67';
         }
 
-        // General logic: Look for a reasonable price pair among frequently appearing prices
-        for (let i = 0; i < frequentPrices.length - 1; i++) {
-          const higherPrice = frequentPrices[i].price;
-          const lowerPrice = frequentPrices[i + 1].price;
+        // CONSERVATIVE approach: Only find regular price if there are EXACTLY 2 reasonable product prices
+        // This prevents false positives from promotional text like "$60+ free shipping"
+        const reasonableProductPrices = frequentPrices.filter(p => 
+          p.price > 1 && p.price < 50 && p.count >= 2  // Product prices are typically $1-50 and appear multiple times
+        );
+
+        if (reasonableProductPrices.length === 2) {
+          const higherPrice = reasonableProductPrices[0].price;
+          const lowerPrice = reasonableProductPrices[1].price;
           
           // Calculate discount percentage
           const discountPercent = ((higherPrice - lowerPrice) / higherPrice) * 100;
           
-          // If prices are within reasonable discount range (5-60%) and under $100
-          if (discountPercent >= 5 && discountPercent <= 60 && higherPrice < 100) {
-            logger.debug('Found frequent price pair with reasonable discount', { 
+          // Only proceed if it's a reasonable discount (10-70%) 
+          if (discountPercent >= 10 && discountPercent <= 70) {
+            logger.debug('Found EXACTLY 2 reasonable product prices with valid discount', { 
               higherPrice,
               lowerPrice,
               discountPercent: discountPercent.toFixed(1),
-              higherCount: frequentPrices[i].count,
-              lowerCount: frequentPrices[i + 1].count
+              higherCount: reasonableProductPrices[0].count,
+              lowerCount: reasonableProductPrices[1].count
             });
             return `$${higherPrice.toFixed(2)}`;
           }
         }
+
+        logger.debug('No valid regular price found - product likely not discounted', {
+          reasonableProductPrices: reasonableProductPrices.map(p => ({ price: p.price, count: p.count }))
+        });
       }
 
       // Try to look for CSS-styled strikethrough elements

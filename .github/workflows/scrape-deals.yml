@@ -110,12 +110,14 @@ jobs:
         npx playwright install --with-deps chromium
         echo "✅ Playwright browser installed"
         
-    # 🎭 Install system dependencies (always run for cached browsers)
-    - name: 🎭 Install system dependencies
+    # 🎭 Install system dependencies (only if needed)
+    - name: 🎭 Install system dependencies for cached browsers
       if: steps.playwright-cache.outputs.cache-hit == 'true'
       run: |
-        npx playwright install-deps chromium
-        echo "✅ System dependencies updated"
+        # Only install essential deps, skip the slow ones
+        sudo apt-get update -qq
+        sudo apt-get install -y --no-install-recommends libnss3 libatk-bridge2.0-0 libdrm2 libgtk-3-0 libgbm1
+        echo "✅ Essential system dependencies installed quickly"
 
     # 🧪 Run tests first to ensure everything works
     - name: 🧪 Run tests
