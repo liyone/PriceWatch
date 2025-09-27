@@ -1,0 +1,63 @@
+# Product Configuration for Deal Scraper
+# Add specific product URLs or category pages to monitor
+
+# Global alert settings
+alerts:
+  min_discount_percent: 20
+  discord_enabled: true
+  deduplication_hours: 24
+
+# Output settings
+output:
+  data_directory: "data"
+  git_commit: true
+
+# Retailer configurations
+retailers:
+  petsmart:
+    enabled: true
+    products:
+      # Real test product for validation
+      - name: "Authority Everyday Health Adult Cat Wet Food - 5.5 Oz"
+        url: "https://www.petsmart.ca/cat/food-and-treats/wet-food/authority-everyday-health-adult-cat-wet-food---55-oz-flaked-in-gravy-51010.html"
+        alert_threshold: 15
+        
+      # Example dog food products - replace with actual URLs you want to monitor
+      - name: "Hill's Science Diet Adult Large Breed Dry Dog Food"
+        url: "https://www.petsmart.ca/dog/food/dry-food/hills-science-diet-adult-large-breed-dry-dog-food-5288966.html"
+        alert_threshold: 20
+        
+      - name: "Royal Canin Medium Adult Dry Dog Food"
+        url: "https://www.petsmart.ca/dog/food/dry-food/royal-canin-size-health-nutrition-medium-adult-dry-dog-food-5112327.html"
+        alert_threshold: 15
+        
+      # Example category pages for broader monitoring
+      - name: "Dog Food Dry Food Category"
+        category_url: "https://www.petsmart.ca/dog/food/dry-food/"
+        brand_filter: "Hill's"
+        alert_threshold: 25
+        
+      - name: "Cat Food Dry Food Category" 
+        category_url: "https://www.petsmart.ca/cat/food/dry-food/"
+        brand_filter: "Royal Canin"
+        alert_threshold: 20
+
+  petvalu:
+    enabled: false  # Disabled for MVP - single site first
+    products: []
+
+  shoppers:
+    enabled: false  # Disabled for MVP - single site first  
+    products: []
+
+# Example of how to add more products:
+# 
+# - name: "Purina Pro Plan Adult Dog Food"
+#   url: "https://www.petsmart.ca/dog/food/dry-food/purina-pro-plan-adult-dog-food.html"
+#   alert_threshold: 20
+#   
+# - name: "Baby Diapers Category"
+#   category_url: "https://www.shoppersdrugmart.ca/en/health-and-pharmacy/baby-and-child-care/diapers"
+#   brand_filter: "Huggies"
+#   size_filter: "Size 3"
+#   alert_threshold: 15

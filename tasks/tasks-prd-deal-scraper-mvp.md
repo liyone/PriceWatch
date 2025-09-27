@@ -65,13 +65,13 @@ Date: September 27, 2025
   - [x] 2.5 Create discount calculation logic with validation
   - [x] 2.6 Test price parsing with real-world price examples from target sites
 
-- [ ] **3.0 Single Site Implementation (PetSmart)**
-  - [ ] 3.1 Research PetSmart product page structure and identify CSS selectors
-  - [ ] 3.2 Implement PetSmart scraper with product extraction logic
-  - [ ] 3.3 Create basic product configuration system (YAML file)
-  - [ ] 3.4 Test scraper with 3-5 sample product URLs and validate extracted data
-  - [ ] 3.5 Implement error handling and graceful failures for missing elements
-  - [ ] 3.6 Generate end-to-end test CSV with real PetSmart data
+- [x] **3.0 Single Site Implementation (PetSmart)**
+  - [x] 3.1 Research PetSmart product page structure and identify CSS selectors
+  - [x] 3.2 Implement PetSmart scraper with product extraction logic
+  - [x] 3.3 Create basic product configuration system (YAML file)
+  - [x] 3.4 Test scraper with 3-5 sample product URLs and validate extracted data
+  - [x] 3.5 Implement error handling and graceful failures for missing elements
+  - [x] 3.6 Generate end-to-end test CSV with real PetSmart data
 
 - [ ] **4.0 Multi-Site Expansion & Configuration System**
   - [ ] 4.1 Research Pet Valu and Shoppers site structures and CSS selectors
