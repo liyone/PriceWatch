@@ -1,5 +1,5 @@
 retailer,product_title,brand,size_text,current_price,regular_price,percent_off,promo_text,product_url,image_url,scraped_at
-petsmart,"Authority® Everyday Health Adult Cat Wet Food - 5.5 Oz, Flaked in Gravy",Authority,5.5 Oz,2.89,,,,https://www.petsmart.ca/cat/food-and-treats/wet-food/authority-everyday-health-adult-cat-wet-food---55-oz-flaked-in-gravy-51010.html,,2025-09-27T21:23:29.244Z
-petsmart,"Authority® Everyday Health Senior Dry Cat Food - Chicken & Rice, With-Grain",Authority,,19.67,,,,https://www.petsmart.ca/cat/food-and-treats/dry-food/authority-everyday-health-senior-dry-cat-food---chicken-and-rice-with-grain-51031.html,,2025-09-27T21:23:32.144Z
-petsmart,Dry Dog Food,Dry,,1.00,,,,https://www.petsmart.ca/dog/food/dry-food/hills-science-diet-adult-large-breed-dry-dog-food-5288966.html,,2025-09-27T21:23:35.650Z
-petsmart,Dry Dog Food,Dry,,1.00,,,,https://www.petsmart.ca/dog/food/dry-food/royal-canin-size-health-nutrition-medium-adult-dry-dog-food-5112327.html,,2025-09-27T21:23:38.930Z
+petsmart,"Authority® Everyday Health Adult Cat Wet Food - 5.5 Oz, Flaked in Gravy",Authority,5.5 Oz,2.89,60.00,95,,https://www.petsmart.ca/cat/food-and-treats/wet-food/authority-everyday-health-adult-cat-wet-food---55-oz-flaked-in-gravy-51010.html,,2025-09-27T21:31:43.852Z
+petsmart,"Authority® Everyday Health Senior Dry Cat Food - Chicken & Rice, With-Grain",Authority,,19.67,24.67,20,,https://www.petsmart.ca/cat/food-and-treats/dry-food/authority-everyday-health-senior-dry-cat-food---chicken-and-rice-with-grain-51031.html,,2025-09-27T21:31:47.401Z
+petsmart,Dry Dog Food,Dry,,1.00,99.99,99,,https://www.petsmart.ca/dog/food/dry-food/hills-science-diet-adult-large-breed-dry-dog-food-5288966.html,,2025-09-27T21:31:51.227Z
+petsmart,Dry Dog Food,Dry,,1.00,99.99,99,,https://www.petsmart.ca/dog/food/dry-food/royal-canin-size-health-nutrition-medium-adult-dry-dog-food-5112327.html,,2025-09-27T21:31:53.983Z
