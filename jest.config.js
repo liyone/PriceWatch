@@ -22,9 +22,6 @@ module.exports = {
     'html'
   ],
   setupFilesAfterEnv: [],
-  moduleNameMapping: {
-    '^@/(.*)$': '<rootDir>/src/$1'
-  },
   verbose: true,
   clearMocks: true,
   restoreMocks: true
