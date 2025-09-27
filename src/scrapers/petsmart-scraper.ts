@@ -98,7 +98,8 @@ export class PetSmartScraper extends BaseScraper {
                               await this.extractPriceFromPage();
       
       const regularPriceText = await this.safeTextContent(this.config.selectors.regularPrice || '') ||
-                              await this.safeTextContent('.was-price, .original-price, .reg-price, .price-original');
+                              await this.safeTextContent('.was-price, .original-price, .reg-price, .price-original') ||
+                              await this.extractRegularPriceFromPage();
 
       // Extract promotional text
       const promoText = await this.safeTextContent(this.config.selectors.promo || '') ||
@@ -282,6 +283,65 @@ export class PetSmartScraper extends BaseScraper {
   }
 
   /**
+   * Extract regular price from page content (look for struck-through or "was" prices)
+   */
+  private async extractRegularPriceFromPage(): Promise<string | null> {
+    if (!this.page) return null;
+
+    try {
+      // Look for all price patterns and try to identify the regular/original price
+      const pageText = await this.page.textContent('body');
+      if (!pageText) return null;
+
+      // Look for price patterns with contextual clues
+      const pricePatterns = [
+        /(?:was|originally|regular|msrp|list)\s*:?\s*\$?(\d{1,4}(?:\.\d{2})?)/gi,
+        /\$(\d{1,4}(?:\.\d{2})?)\s*(?:was|originally|regular|list)/gi,
+      ];
+
+      for (const pattern of pricePatterns) {
+        const matches = [...pageText.matchAll(pattern)];
+        if (matches.length > 0) {
+          const price = matches[0][1];
+          const numericValue = parseFloat(price);
+          if (numericValue > 0.50 && numericValue < 1000) {
+            logger.debug('Extracted regular price from page text', { 
+              originalMatch: matches[0][0], 
+              price,
+              numericValue 
+            });
+            return `$${price}`;
+          }
+        }
+      }
+
+      // If no explicit "was" price found, look for multiple prices and take the higher one
+      const allPriceMatches = pageText.match(/\$\d{1,4}(?:\.\d{2})?/g);
+      if (allPriceMatches && allPriceMatches.length >= 2) {
+        const prices = allPriceMatches
+          .map(p => parseFloat(p.replace('$', '')))
+          .filter(p => p > 0.50 && p < 1000)
+          .sort((a, b) => b - a); // Sort descending
+
+        if (prices.length >= 2 && prices[0] > prices[1]) {
+          logger.debug('Extracted regular price as higher of multiple prices', { 
+            allPrices: prices,
+            selectedPrice: prices[0]
+          });
+          return `$${prices[0].toFixed(2)}`;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      logger.debug('Failed to extract regular price from page content', {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return null;
+    }
+  }
+
+  /**
    * Extract price from page content using multiple strategies
    */
   private async extractPriceFromPage(): Promise<string | null> {
@@ -301,19 +361,27 @@ export class PetSmartScraper extends BaseScraper {
       for (const pattern of pricePatterns) {
         const matches = pageText.match(pattern);
         if (matches && matches.length > 0) {
-          // Return the first reasonable price found (not too small, not too large)
-          for (const match of matches) {
-            const cleanPrice = match.replace(/[^$\d.]/g, '');
-            const numericValue = parseFloat(cleanPrice.replace('$', ''));
-            if (numericValue > 0.50 && numericValue < 1000) {
-              logger.debug('Extracted price from page text', { 
-                originalMatch: match, 
-                cleanPrice,
-                numericValue 
-              });
-              return cleanPrice;
-            }
+        // Collect all reasonable prices and prefer the lower one (current price)
+        const validPrices: { price: string; value: number }[] = [];
+        for (const match of matches) {
+          const cleanPrice = match.replace(/[^$\d.]/g, '');
+          const numericValue = parseFloat(cleanPrice.replace('$', ''));
+          if (numericValue > 0.50 && numericValue < 1000) {
+            validPrices.push({ price: cleanPrice, value: numericValue });
           }
+        }
+        
+        if (validPrices.length > 0) {
+          // Sort by value and take the lower price (likely current/sale price)
+          validPrices.sort((a, b) => a.value - b.value);
+          const selectedPrice = validPrices[0];
+          
+          logger.debug('Extracted current price from page text', { 
+            allPrices: validPrices.map(p => p.price),
+            selectedPrice: selectedPrice.price
+          });
+          return selectedPrice.price;
+        }
         }
       }
 

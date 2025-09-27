@@ -22,6 +22,11 @@ retailers:
         url: "https://www.petsmart.ca/cat/food-and-treats/wet-food/authority-everyday-health-adult-cat-wet-food---55-oz-flaked-in-gravy-51010.html"
         alert_threshold: 1
         
+      # Product with actual discount for testing alerts
+      - name: "Authority Senior Dry Cat Food - Chicken & Rice - 7 Lb"
+        url: "https://www.petsmart.ca/cat/food-and-treats/dry-food/authority-everyday-health-senior-dry-cat-food---chicken-and-rice-with-grain-51031.html"
+        alert_threshold: 1
+        
       # Example dog food products - low thresholds for testing
       - name: "Hill's Science Diet Adult Large Breed Dry Dog Food"
         url: "https://www.petsmart.ca/dog/food/dry-food/hills-science-diet-adult-large-breed-dry-dog-food-5288966.html"
