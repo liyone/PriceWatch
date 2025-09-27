@@ -1,6 +1,4 @@
 retailer,product_title,brand,size_text,current_price,regular_price,percent_off,promo_text,product_url,image_url,scraped_at
-petsmart,Hill's Science Diet Adult Large Breed Dry Dog Food,Hill's,15kg,89.99,109.99,18,Save $20,https://www.petsmart.ca/dog/food/dry-food/hills-science-diet/,https://www.petsmart.ca/dw/image/v2/hills-dog-food.jpg,2025-09-27T20:32:56.529Z
-petvalu,Royal Canin Medium Adult Dry Dog Food,Royal Canin,12kg,74.99,84.99,12,Member Price,https://www.petvalu.ca/product/royal-canin-medium-adult,https://www.petvalu.ca/images/royal-canin-medium.jpg,2025-09-27T20:32:56.529Z
-shoppers,Huggies Little Snugglers Diapers Size 3,Huggies,84 count,31.99,39.99,20,10x Points,https://www.shoppersdrugmart.ca/en/health-and-pharmacy/baby-and-child-care,https://www.shoppersdrugmart.ca/images/huggies-diapers.jpg,2025-09-27T20:32:56.529Z
-petsmart,Purina Pro Plan Adult Cat Food,Purina,7kg,54.99,,,,https://www.petsmart.ca/cat/food/dry-food/purina-pro-plan,,2025-09-27T20:32:56.529Z
-shoppers,Pampers Baby Dry Diapers Size 2,Pampers,92 count,28.99,34.99,17,Special Offer,https://www.shoppersdrugmart.ca/en/health-and-pharmacy/baby-and-child-care/pampers,,2025-09-27T20:32:56.529Z
+petsmart,"Authority® Everyday Health Adult Cat Wet Food - 5.5 Oz, Flaked in Gravy",Authority,5.5 Oz,2.89,,,,https://www.petsmart.ca/cat/food-and-treats/wet-food/authority-everyday-health-adult-cat-wet-food---55-oz-flaked-in-gravy-51010.html,,2025-09-27T21:00:21.646Z
+petsmart,Dry Dog Food,Dry,,60.00,,,,https://www.petsmart.ca/dog/food/dry-food/hills-science-diet-adult-large-breed-dry-dog-food-5288966.html,,2025-09-27T21:00:25.159Z
+petsmart,Dry Dog Food,Dry,,60.00,,,,https://www.petsmart.ca/dog/food/dry-food/royal-canin-size-health-nutrition-medium-adult-dry-dog-food-5112327.html,,2025-09-27T21:00:27.960Z

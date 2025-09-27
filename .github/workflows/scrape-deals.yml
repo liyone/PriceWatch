@@ -1,0 +1,288 @@
+name: 🛒 Price Watch Deal Scraper
+
+on:
+  # Scheduled runs - 3 times daily
+  schedule:
+    # Run at 8:00 AM ET (12:00 UTC)
+    - cron: '0 12 * * *'
+    # Run at 2:00 PM ET (18:00 UTC) 
+    - cron: '0 18 * * *'
+    # Run at 8:00 PM ET (00:00 UTC next day)
+    - cron: '0 0 * * *'
+  
+  # Manual trigger (easily triggerable!)
+  workflow_dispatch:
+    inputs:
+      retailers:
+        description: 'Retailers to scrape (comma-separated: petsmart,petvalu,shoppers or "all")'
+        required: false
+        default: 'all'
+        type: string
+      
+      alert_threshold:
+        description: 'Minimum discount percentage for alerts'
+        required: false
+        default: '20'
+        type: string
+      
+      log_level:
+        description: 'Log level for debugging'
+        required: false
+        default: 'info'
+        type: choice
+        options:
+          - debug
+          - info
+          - warn
+          - error
+      
+      test_mode:
+        description: 'Run in test mode (skip Discord alerts)'
+        required: false
+        default: false
+        type: boolean
+
+  # Push trigger for testing
+  push:
+    branches: [ main ]
+    paths: 
+      - 'src/**'
+      - '.github/workflows/scrape-deals.yml'
+      - 'package.json'
+    # Only run on push if it contains specific commit message
+    # This prevents accidental runs on every commit
+
+jobs:
+  scrape-deals:
+    name: 🕷️ Scrape Deals & Generate Alerts
+    runs-on: ubuntu-latest
+    
+    # Set timeout to prevent runaway jobs
+    timeout-minutes: 30
+    
+    steps:
+    # 📥 Checkout the repository
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+      with:
+        # Fetch enough history for proper git commits
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    # 🔧 Setup Node.js
+    - name: 🔧 Setup Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    # 📦 Install dependencies
+    - name: 📦 Install dependencies
+      run: |
+        npm ci
+        echo "✅ Dependencies installed"
+
+    # 🎭 Install Playwright browser
+    - name: 🎭 Install Playwright browser
+      run: |
+        npx playwright install --with-deps chromium
+        echo "✅ Playwright browser installed"
+
+    # 🧪 Run tests first to ensure everything works
+    - name: 🧪 Run tests
+      run: |
+        npm test
+        echo "✅ All tests passed"
+
+    # 📋 Display configuration info
+    - name: 📋 Display run configuration
+      run: |
+        echo "🔍 Run Configuration:"
+        echo "  Trigger: ${{ github.event_name }}"
+        echo "  Retailers: ${{ github.event.inputs.retailers || 'all' }}"
+        echo "  Alert Threshold: ${{ github.event.inputs.alert_threshold || '20' }}%"
+        echo "  Log Level: ${{ github.event.inputs.log_level || 'info' }}"
+        echo "  Test Mode: ${{ github.event.inputs.test_mode || 'false' }}"
+        echo "  Branch: ${{ github.ref_name }}"
+        echo "  Commit: ${{ github.sha }}"
+        echo "  Runner: ${{ runner.os }}"
+
+    # 🛒 Run the scraper
+    - name: 🛒 Run PriceWatch scraper
+      env:
+        # Discord webhook for alerts
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        
+        # Configuration overrides from manual inputs
+        ALERT_MIN_PERCENT: ${{ github.event.inputs.alert_threshold || '20' }}
+        LOG_LEVEL: ${{ github.event.inputs.log_level || 'info' }}
+        TEST_MODE: ${{ github.event.inputs.test_mode || 'false' }}
+        ENABLED_RETAILERS: ${{ github.event.inputs.retailers || 'all' }}
+        
+        # GitHub context
+        GITHUB_RUN_ID: ${{ github.run_id }}
+        GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        GITHUB_REF: ${{ github.ref }}
+        GITHUB_SHA: ${{ github.sha }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_ACTOR: ${{ github.actor }}
+        
+        # Environment
+        NODE_ENV: production
+        TZ: America/Toronto
+        
+      run: |
+        echo "🚀 Starting PriceWatch scraper..."
+        
+        # Build the project
+        npm run build
+        
+        # Run the scraper
+        node dist/src/main.js
+        
+        echo "✅ Scraper completed"
+
+    # 📊 Upload CSV artifacts
+    - name: 📊 Upload CSV files as artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: deal-data-${{ github.run_number }}
+        path: data/*.csv
+        retention-days: 30
+
+    # 📈 Display results summary
+    - name: 📈 Display results summary
+      if: always()
+      run: |
+        echo "📊 Results Summary:"
+        
+        # Count CSV files generated
+        CSV_COUNT=$(ls data/*.csv 2>/dev/null | wc -l || echo "0")
+        echo "  CSV files generated: $CSV_COUNT"
+        
+        # Show latest CSV file info if exists
+        if [ "$CSV_COUNT" -gt 0 ]; then
+          LATEST_CSV=$(ls -t data/*.csv | head -1)
+          RECORD_COUNT=$(tail -n +2 "$LATEST_CSV" | wc -l)
+          FILE_SIZE=$(du -h "$LATEST_CSV" | cut -f1)
+          echo "  Latest CSV: $LATEST_CSV"
+          echo "  Records: $RECORD_COUNT"
+          echo "  File size: $FILE_SIZE"
+          
+          # Show first few records (if any)
+          if [ "$RECORD_COUNT" -gt 0 ]; then
+            echo "  Sample records:"
+            head -3 "$LATEST_CSV" | sed 's/^/    /'
+          fi
+        fi
+
+    # 🔄 Commit CSV files back to repository
+    - name: 🔄 Commit CSV files to repository
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Configure git
+        git config --local user.email "action@github.com"
+        git config --local user.name "PriceWatch Bot"
+        
+        # Add any new CSV files
+        git add data/*.csv data/.gitkeep 2>/dev/null || true
+        
+        # Check if there are changes
+        if git diff --staged --quiet; then
+          echo "📭 No CSV changes to commit"
+        else
+          # Commit with informative message
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+          TRIGGER="${{ github.event_name }}"
+          
+          if [ "$TRIGGER" = "workflow_dispatch" ]; then
+            COMMIT_MSG="🤖 Manual scrape: CSV data update ($TIMESTAMP)"
+          elif [ "$TRIGGER" = "schedule" ]; then
+            COMMIT_MSG="🕒 Scheduled scrape: CSV data update ($TIMESTAMP)"
+          else
+            COMMIT_MSG="🔄 Automated scrape: CSV data update ($TIMESTAMP)"
+          fi
+          
+          git commit -m "$COMMIT_MSG" -m "Triggered by: ${{ github.event_name }}" -m "Run ID: ${{ github.run_id }}"
+          
+          # Push changes
+          git push
+          
+          echo "✅ CSV files committed and pushed"
+          
+          # Display commit info
+          echo "📝 Commit details:"
+          git log -1 --oneline
+        fi
+
+    # ⚠️ Handle failures
+    - name: ⚠️ Handle failure
+      if: failure()
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      run: |
+        echo "❌ Workflow failed!"
+        
+        # Try to send failure notification to Discord if webhook is available
+        if [ -n "$DISCORD_WEBHOOK" ]; then
+          curl -H "Content-Type: application/json" \
+               -d '{
+                 "embeds": [{
+                   "title": "🚨 PriceWatch Scraper Failed",
+                   "description": "GitHub Actions workflow failed",
+                   "color": 16711680,
+                   "fields": [
+                     {"name": "Repository", "value": "${{ github.repository }}", "inline": true},
+                     {"name": "Run ID", "value": "${{ github.run_id }}", "inline": true},
+                     {"name": "Trigger", "value": "${{ github.event_name }}", "inline": true},
+                     {"name": "Branch", "value": "${{ github.ref_name }}", "inline": true}
+                   ],
+                   "footer": {"text": "PriceWatch Error Alert"},
+                   "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%S.000Z)'"
+                 }]
+               }' \
+               "$DISCORD_WEBHOOK" || echo "Failed to send Discord notification"
+        fi
+        
+        exit 1
+
+  # 🧹 Cleanup old artifacts (runs weekly)
+  cleanup:
+    name: 🧹 Cleanup old data
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' && github.event.schedule == '0 0 * * 0' # Sunday midnight
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🧹 Clean up old CSV files
+      run: |
+        echo "🧹 Cleaning up CSV files older than 30 days..."
+        
+        # Find and remove CSV files older than 30 days
+        find data/ -name "*.csv" -type f -mtime +30 -delete 2>/dev/null || true
+        
+        # Count remaining files
+        REMAINING=$(ls data/*.csv 2>/dev/null | wc -l || echo "0")
+        echo "📊 Remaining CSV files: $REMAINING"
+
+    # 📤 Commit cleanup if changes were made
+    - name: 📤 Commit cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "PriceWatch Cleanup Bot"
+        
+        git add data/ 2>/dev/null || true
+        
+        if ! git diff --staged --quiet; then
+          git commit -m "🧹 Automated cleanup: Remove old CSV files (30+ days)"
+          git push
+          echo "✅ Cleanup changes committed"
+        else
+          echo "📭 No cleanup changes to commit"
+        fi

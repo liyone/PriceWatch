@@ -161,8 +161,9 @@ export function validateConfig(config: ScrapingConfig): string[] {
     }
   }
   
-  // Validate alert settings
-  if (config.alerts.discord_enabled && !config.alerts.discord_webhook) {
+  // Validate alert settings (skip in test mode)
+  const isTestMode = process.env.TEST_MODE === 'true' || process.env.NODE_ENV === 'test';
+  if (config.alerts.discord_enabled && !config.alerts.discord_webhook && !process.env.DISCORD_WEBHOOK && !isTestMode) {
     errors.push('Discord alerts are enabled but DISCORD_WEBHOOK environment variable is not set');
   }
   
