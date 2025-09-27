@@ -149,6 +149,7 @@ export class DiscordAlert {
     dealsFound: number;
     executionTimeMs: number;
     csvFile: string;
+    csvUrl?: string;
   }): Promise<void> {
     try {
       const embed: DiscordEmbed = {
@@ -172,7 +173,7 @@ export class DiscordAlert {
           },
           {
             name: '📄 CSV File',
-            value: summary.csvFile,
+            value: summary.csvUrl ? `[${summary.csvFile}](${summary.csvUrl})` : summary.csvFile,
             inline: false
           }
         ],

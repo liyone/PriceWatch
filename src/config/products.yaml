@@ -33,8 +33,17 @@ retailers:
     products: []
 
   shoppers:
-    enabled: false  # Disabled for MVP - single site first  
-    products: []
+    enabled: true  # Enable for testing
+    products:
+      # Regular product for validation (no discount expected)
+      - name: "Enfamil NeuroPro Baby Formula 0-12 Months Ready to Feed"
+        url: "https://www.shoppersdrugmart.ca/enfamil-neuropro-baby-formula-0-12-months-ready-to-feed-bo/p/BB_056796906606?variantCode=056796906606&source=nspt"
+        alert_threshold: 1
+        
+      # Product with actual discount for testing alerts
+      - name: "Enfamil NeuroPro Gentlease Baby Formula 0-12 Months Powder" 
+        url: "https://www.shoppersdrugmart.ca/enfamil-neuropro-gentlease-baby-formula-0-12-months-powder/p/BB_056796006610?variantCode=056796006610&source=nspt"
+        alert_threshold: 1
 
 # Example of how to add more products:
 # 
