@@ -70,12 +70,13 @@ jobs:
         fetch-depth: 0
         token: ${{ secrets.GITHUB_TOKEN }}
 
-    # 🔧 Setup Node.js
+    # 🔧 Setup Node.js with npm cache
     - name: 🔧 Setup Node.js 20
       uses: actions/setup-node@v4
       with:
         node-version: '20'
         cache: 'npm'
+        cache-dependency-path: 'package-lock.json'
 
     # 📦 Install dependencies
     - name: 📦 Install dependencies
@@ -83,11 +84,33 @@ jobs:
         npm ci
         echo "✅ Dependencies installed"
 
-    # 🎭 Install Playwright browser
+    # 🎭 Cache Playwright browsers
+    - name: 🎭 Cache Playwright browsers
+      uses: actions/cache@v3
+      id: playwright-cache
+      with:
+        path: |
+          ~/.cache/ms-playwright
+          ~/Library/Caches/ms-playwright
+          %USERPROFILE%\AppData\Local\ms-playwright
+        key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}-chromium
+        restore-keys: |
+          ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}-
+          ${{ runner.os }}-playwright-
+
+    # 🎭 Install Playwright browser (only if not cached)
     - name: 🎭 Install Playwright browser
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
       run: |
         npx playwright install --with-deps chromium
         echo "✅ Playwright browser installed"
+        
+    # 🎭 Install system dependencies (always run for cached browsers)
+    - name: 🎭 Install system dependencies
+      if: steps.playwright-cache.outputs.cache-hit == 'true'
+      run: |
+        npx playwright install-deps chromium
+        echo "✅ System dependencies updated"
 
     # 🧪 Run tests first to ensure everything works
     - name: 🧪 Run tests
