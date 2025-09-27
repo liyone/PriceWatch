@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/src/main.js",
+    "start:real-browser": "node dist/src/main-real-browser.js",
     "dev": "ts-node src/main.ts",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -32,6 +33,7 @@
   "dependencies": {
     "fast-csv": "^4.3.6",
     "js-yaml": "^4.1.0",
+    "jsdom": "^27.0.0",
     "playwright": "^1.38.1",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
