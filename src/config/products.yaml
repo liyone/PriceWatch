@@ -1,9 +1,9 @@
 # Product Configuration for Deal Scraper
 # Add specific product URLs or category pages to monitor
 
-# Global alert settings
+# Global alert settings - lowered for testing
 alerts:
-  min_discount_percent: 20
+  min_discount_percent: 1  # Very low threshold to test alerts
   discord_enabled: true
   deduplication_hours: 24
 
@@ -17,19 +17,19 @@ retailers:
   petsmart:
     enabled: true
     products:
-      # Real test product for validation
+      # Real test product for validation - low threshold for testing alerts
       - name: "Authority Everyday Health Adult Cat Wet Food - 5.5 Oz"
         url: "https://www.petsmart.ca/cat/food-and-treats/wet-food/authority-everyday-health-adult-cat-wet-food---55-oz-flaked-in-gravy-51010.html"
-        alert_threshold: 15
+        alert_threshold: 1
         
-      # Example dog food products - replace with actual URLs you want to monitor
+      # Example dog food products - low thresholds for testing
       - name: "Hill's Science Diet Adult Large Breed Dry Dog Food"
         url: "https://www.petsmart.ca/dog/food/dry-food/hills-science-diet-adult-large-breed-dry-dog-food-5288966.html"
-        alert_threshold: 20
+        alert_threshold: 5
         
       - name: "Royal Canin Medium Adult Dry Dog Food"
         url: "https://www.petsmart.ca/dog/food/dry-food/royal-canin-size-health-nutrition-medium-adult-dry-dog-food-5112327.html"
-        alert_threshold: 15
+        alert_threshold: 5
         
       # Example category pages for broader monitoring
       - name: "Dog Food Dry Food Category"
