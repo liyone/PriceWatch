@@ -49,7 +49,7 @@ Date: September 27, 2025
 
 ## Tasks
 
-- [ ] **1.0 Project Foundation & Basic Infrastructure**
+- [x] **1.0 Project Foundation & Basic Infrastructure**
   - [x] 1.1 Initialize Node.js project with TypeScript configuration and essential dependencies
   - [x] 1.2 Set up Jest testing framework with TypeScript support
   - [x] 1.3 Create basic TypeScript interfaces and types for the project
@@ -57,13 +57,13 @@ Date: September 27, 2025
   - [x] 1.5 Create structured logging utility for debugging and monitoring
   - [x] 1.6 Validate foundation with a simple test CSV generation
 
-- [ ] **2.0 Core Scraping Framework & Price Parsing**
-  - [ ] 2.1 Install and configure Playwright with Chromium browser
-  - [ ] 2.2 Create abstract base scraper class with common functionality
-  - [ ] 2.3 Implement robust price parsing utility (handle $34.99, $1,299.99, Sale: formats)
-  - [ ] 2.4 Write comprehensive unit tests for price parsing with edge cases
-  - [ ] 2.5 Create discount calculation logic with validation
-  - [ ] 2.6 Test price parsing with real-world price examples from target sites
+- [x] **2.0 Core Scraping Framework & Price Parsing**
+  - [x] 2.1 Install and configure Playwright with Chromium browser
+  - [x] 2.2 Create abstract base scraper class with common functionality
+  - [x] 2.3 Implement robust price parsing utility (handle $34.99, $1,299.99, Sale: formats)
+  - [x] 2.4 Write comprehensive unit tests for price parsing with edge cases
+  - [x] 2.5 Create discount calculation logic with validation
+  - [x] 2.6 Test price parsing with real-world price examples from target sites
 
 - [ ] **3.0 Single Site Implementation (PetSmart)**
   - [ ] 3.1 Research PetSmart product page structure and identify CSS selectors
