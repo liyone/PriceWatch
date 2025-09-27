@@ -27,25 +27,6 @@ retailers:
         url: "https://www.petsmart.ca/cat/food-and-treats/dry-food/authority-everyday-health-senior-dry-cat-food---chicken-and-rice-with-grain-51031.html"
         alert_threshold: 1
         
-      # Example dog food products - low thresholds for testing
-      - name: "Hill's Science Diet Adult Large Breed Dry Dog Food"
-        url: "https://www.petsmart.ca/dog/food/dry-food/hills-science-diet-adult-large-breed-dry-dog-food-5288966.html"
-        alert_threshold: 5
-        
-      - name: "Royal Canin Medium Adult Dry Dog Food"
-        url: "https://www.petsmart.ca/dog/food/dry-food/royal-canin-size-health-nutrition-medium-adult-dry-dog-food-5112327.html"
-        alert_threshold: 5
-        
-      # Example category pages for broader monitoring
-      - name: "Dog Food Dry Food Category"
-        category_url: "https://www.petsmart.ca/dog/food/dry-food/"
-        brand_filter: "Hill's"
-        alert_threshold: 25
-        
-      - name: "Cat Food Dry Food Category" 
-        category_url: "https://www.petsmart.ca/cat/food/dry-food/"
-        brand_filter: "Royal Canin"
-        alert_threshold: 20
 
   petvalu:
     enabled: false  # Disabled for MVP - single site first
