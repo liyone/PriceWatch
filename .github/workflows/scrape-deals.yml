@@ -61,6 +61,11 @@ jobs:
     # Set timeout to prevent runaway jobs
     timeout-minutes: 30
     
+    # Grant write permissions for committing CSV files
+    permissions:
+      contents: write
+      actions: read
+    
     steps:
     # 📥 Checkout the repository
     - name: 📥 Checkout repository
