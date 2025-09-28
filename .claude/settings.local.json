@@ -1,10 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm start)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "WebSearch"
+      "Bash(npm run build:*)",
+      "Bash(node:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npm run start:*)",
+      "Bash(pkill:*)",
+      "Bash(taskkill:*)",
+      "Bash(npm install:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
