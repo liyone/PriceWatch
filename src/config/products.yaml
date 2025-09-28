@@ -4,7 +4,7 @@
 # Global alert settings - lowered for testing
 alerts:
   min_discount_percent: 1  # Very low threshold to test alerts
-  discord_enabled: false
+  discord_enabled: true
   deduplication_hours: 24
 
 # Output settings
@@ -33,7 +33,7 @@ retailers:
     products: []
 
   shoppers:
-    enabled: false  # Disabled: Bot detection blocks automation
+    enabled: true  # Enable for testing
     products:
       # Regular product for validation (no discount expected)
       - name: "Enfamil NeuroPro Baby Formula 0-12 Months Ready to Feed"

@@ -26,10 +26,10 @@ export abstract class BaseScraper {
     try {
       logger.debug(`Initializing browser for ${this.retailerName}`);
       
-      // Launch browser with enhanced stealth arguments
+      // Launch browser with stealth arguments
       this.browser = await chromium.launch({
         headless: true,
-        timeout: 20000, // Reduced timeout
+        timeout: 30000,
         args: [
           '--no-default-browser-check',
           '--no-first-run',
@@ -39,21 +39,10 @@ export abstract class BaseScraper {
           '--disable-background-timer-throttling',
           '--disable-renderer-backgrounding',
           '--disable-device-discovery-notifications',
-          '--disable-blink-features=AutomationControlled',
-          '--disable-features=VizDisplayCompositor',
-          '--disable-ipc-flooding-protection',
-          '--disable-backgrounding-occluded-windows',
-          '--disable-component-extensions-with-background-pages',
-          '--disable-extensions',
-          '--disable-component-update',
           '--no-sandbox',
           '--disable-web-security',
-          '--disable-features=TranslateUI',
-          '--disable-features=BlinkGenPropertyTrees',
-          '--no-first-run',
-          '--no-service-autorun',
-          '--password-store=basic',
-          '--use-mock-keychain'
+          '--disable-features=VizDisplayCompositor',
+          '--disable-blink-features=AutomationControlled'
         ]
       });
 
@@ -135,9 +124,9 @@ export abstract class BaseScraper {
         });
       });
       
-      // Set more reasonable timeouts to avoid getting stuck
-      this.page.setDefaultTimeout(15000);
-      this.page.setDefaultNavigationTimeout(20000);
+      // Set longer timeouts for potentially slow-loading pages
+      this.page.setDefaultTimeout(25000);
+      this.page.setDefaultNavigationTimeout(30000);
       
       logger.debug(`Browser initialized for ${this.retailerName}`);
     } catch (error) {
@@ -150,9 +139,7 @@ export abstract class BaseScraper {
   /**
    * Navigate to a URL with retries, error handling, and human-like behavior
    */
-  protected async navigateToUrl(url: string, options: { maxRetries?: number; timeout?: number } = {}): Promise<void> {
-    const maxRetries = options.maxRetries || 3;
-    const timeout = options.timeout || 15000;
+  protected async navigateToUrl(url: string, maxRetries: number = 3): Promise<void> {
     if (!this.page) {
       throw new Error('Page not initialized. Call initializeBrowser first.');
     }
@@ -171,11 +158,11 @@ export abstract class BaseScraper {
         const preNavigationDelay = 500 + Math.random() * 1500; // 0.5-2 seconds
         await new Promise(resolve => setTimeout(resolve, preNavigationDelay));
         
-        // Try multiple wait strategies - start with faster ones
+        // Try multiple wait strategies
         const waitStrategies = [
-          'domcontentloaded',
-          'load',
-          'networkidle'
+          'networkidle',
+          'domcontentloaded', 
+          'load'
         ];
         
         let navigated = false;
@@ -183,7 +170,7 @@ export abstract class BaseScraper {
           try {
             await this.page.goto(url, {
               waitUntil: waitUntil as any,
-              timeout: 15000  // Reduced from 30000
+              timeout: 30000
             });
             navigated = true;
             logger.debug(`Navigation succeeded with waitUntil: ${waitUntil}`, {
@@ -205,8 +192,8 @@ export abstract class BaseScraper {
           throw new Error('All navigation strategies failed');
         }
 
-        // Simulate human reading/interaction time - reduced
-        const humanDelay = 1000 + Math.random() * 2000; // 1-3 seconds
+        // Simulate human reading/interaction time
+        const humanDelay = 2000 + Math.random() * 3000; // 2-5 seconds
         await this.page.waitForTimeout(humanDelay);
         
         // Add subtle mouse movements to simulate human presence
@@ -228,9 +215,9 @@ export abstract class BaseScraper {
         });
 
         if (attempt < maxRetries) {
-          // Shorter progressive backoff with randomization
-          const baseWaitTime = attempt * 1000; // Reduced from 2000
-          const randomDelay = Math.random() * 1000; // Reduced from 2000
+          // Progressive backoff with randomization
+          const baseWaitTime = attempt * 2000;
+          const randomDelay = Math.random() * 2000; // Add 0-2 seconds randomness
           const waitTime = baseWaitTime + randomDelay;
           
           logger.debug(`Waiting ${waitTime}ms before retry`, {

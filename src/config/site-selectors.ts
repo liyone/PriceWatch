@@ -77,11 +77,11 @@ export const shoppersConfig: SiteConfig = {
     // Product information - enhanced for Shoppers structure  
     title: 'h1, .product-title, .product-name, [data-testid="product-title"]',
     
-    // Price selectors - enhanced for Shoppers pricing (updated with working selector)
-    currentPrice: '[data-testid="price-container"], .price, .current-price, .sale-price, .price-now, [data-testid="current-price"], .selling-price, .pc-price',
+    // Price selectors - enhanced for Shoppers pricing
+    currentPrice: '.price, .current-price, .sale-price, .price-now, [data-testid="current-price"], .selling-price, .pc-price',
     
-    // Regular/original price (for discounts) - updated with working selector
-    regularPrice: '.plp__priceStrikeThrough__2MAlQ, .price-original, .was-price, .reg-price, .regular-price, .crossed-out-price, .strike-through, .price-reg',
+    // Regular/original price (for discounts)
+    regularPrice: '.price-original, .was-price, .reg-price, .regular-price, .crossed-out-price, .strike-through, .price-reg',
     
     // Product link (for category pages) - updated for Shoppers URLs
     productLink: 'a[href*="/p/"], a[href*="shoppersdrugmart.ca"], .product-link',
