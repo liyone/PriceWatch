@@ -6,7 +6,6 @@
 import { loadAndValidateConfig, getEnabledRetailers, getProductUrlsForRetailer } from './config/config-loader';
 import { loadEnvironmentConfig, isGitHubActions, isTestMode } from './config/environment';
 import { PetSmartScraper } from './scrapers/petsmart-scraper';
-import { ShoppersScraper } from './scrapers/shoppers-scraper';
 import { writeProductsToCSV, getTodaysCSVPath } from './utils/csv';
 import { createDiscordAlert } from './alerts/discord';
 import { logger } from './utils/logger';
@@ -100,8 +99,8 @@ export async function main(): Promise<ScrapingResult> {
             logger.warn(`${retailerName} scraper not implemented yet, skipping`);
             continue;
           case 'shoppers':
-            scraper = new ShoppersScraper();
-            break;
+            logger.warn(`${retailerName} scraper not implemented yet, skipping`);
+            continue;
           default:
             logger.error(`Unknown retailer: ${retailerName}`);
             continue;
@@ -184,19 +183,13 @@ export async function main(): Promise<ScrapingResult> {
         const executionTime = Date.now() - startTime;
         const csvPath = getTodaysCSVPath(config.output.data_directory);
         
-        const csvFileName = csvPath.split('/').pop() || csvPath.split('\\').pop() || csvPath;
-        const csvUrl = envConfig.github?.repository ? 
-          `https://github.com/${envConfig.github.repository}/blob/main/data/${csvFileName}` : 
-          undefined;
-        
         await discordAlert.sendSummaryAlert({
           totalProducts: enabledRetailers.reduce((total, r) => total + getProductUrlsForRetailer(r.config).length, 0),
           successfulScrapes: allProducts.length,
           errors: allErrors.length,
           dealsFound: alertsSent,
           executionTimeMs: executionTime,
-          csvFile: csvFileName,
-          csvUrl: csvUrl
+          csvFile: csvPath.split('/').pop() || csvPath.split('\\').pop() || csvPath
         });
       } catch (alertError) {
         logger.error('Failed to send summary alert', {

@@ -71,34 +71,17 @@ export const petvaluConfig: SiteConfig = {
 export const shoppersConfig: SiteConfig = {
   baseUrl: 'https://www.shoppersdrugmart.ca',
   selectors: {
-    // Product grid container
-    productCard: '.product-tile, .product-item, .product-card',
-    
-    // Product information - enhanced for Shoppers structure  
-    title: 'h1, .product-title, .product-name, [data-testid="product-title"]',
-    
-    // Price selectors - enhanced for Shoppers pricing
-    currentPrice: '.price, .current-price, .sale-price, .price-now, [data-testid="current-price"], .selling-price, .pc-price',
-    
-    // Regular/original price (for discounts)
-    regularPrice: '.price-original, .was-price, .reg-price, .regular-price, .crossed-out-price, .strike-through, .price-reg',
-    
-    // Product link (for category pages) - updated for Shoppers URLs
-    productLink: 'a[href*="/p/"], a[href*="shoppersdrugmart.ca"], .product-link',
-    
-    // Product image
-    image: '.product-image img, img[alt*="product"], .pdp-image img',
-    
-    // Promotional badges/text - including PC Points
-    promo: '.badge, .promo-text, .sale-badge, .discount-badge, .offer-text, .pc-points, .points-text',
-    
-    // Brand name
-    brand: '.brand-name, .product-brand, [data-testid="brand"]',
-    
-    // Size/quantity information
-    size: '.product-size, .size-info, .package-size, .volume'
+    productCard: '.product-tile, .product-item',
+    title: '.product-title, .product-name',
+    currentPrice: '.price-current, .pc-price',
+    regularPrice: '.price-original, .price-reg',
+    productLink: 'a[href*="/product/"]',
+    image: '.product-image img',
+    promo: '.badge, .pc-points, .promo-text',
+    brand: '.brand-name',
+    size: '.product-size'
   },
-  delay: 1000, // Be respectful to Shoppers
+  delay: 700,
   maxRetries: 3
 };
 
