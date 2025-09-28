@@ -21,12 +21,6 @@ retailers:
       - name: "Authority Everyday Health Adult Cat Wet Food - 5.5 Oz"
         url: "https://www.petsmart.ca/cat/food-and-treats/wet-food/authority-everyday-health-adult-cat-wet-food---55-oz-flaked-in-gravy-51010.html"
         alert_threshold: 1
-        
-      # Product with actual discount for testing alerts
-      - name: "Authority Senior Dry Cat Food - Chicken & Rice - 7 Lb"
-        url: "https://www.petsmart.ca/cat/food-and-treats/dry-food/authority-everyday-health-senior-dry-cat-food---chicken-and-rice-with-grain-51031.html"
-        alert_threshold: 1
-        
 
   petvalu:
     enabled: false  # Disabled for MVP - single site first
