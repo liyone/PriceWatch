@@ -86,9 +86,29 @@ export const shoppersConfig: SiteConfig = {
 };
 
 /**
+ * QuiverQuant configuration
+ */
+export const quiverquantConfig: SiteConfig = {
+  baseUrl: 'https://www.quiverquant.com',
+  selectors: {
+    productCard: 'div.table-inner.loaded-table a', // Selects all row elements
+    title: 'div a', // Ticker
+    currentPrice: 'span', // Amount (using span as placeholder)
+    regularPrice: 'strong', // Transaction type (using strong as placeholder)
+    productLink: 'a.ticker-link',
+    image: '', // No images
+    promo: '',
+    brand: '',
+    size: ''
+  },
+  delay: 2000,
+  maxRetries: 3
+};
+
+/**
  * Get configuration for a specific retailer
  */
-export function getSiteConfig(retailer: 'petsmart' | 'petvalu' | 'shoppers'): SiteConfig {
+export function getSiteConfig(retailer: 'petsmart' | 'petvalu' | 'shoppers' | 'quiverquant'): SiteConfig {
   switch (retailer) {
     case 'petsmart':
       return petsmartConfig;
@@ -96,6 +116,8 @@ export function getSiteConfig(retailer: 'petsmart' | 'petvalu' | 'shoppers'): Si
       return petvaluConfig;
     case 'shoppers':
       return shoppersConfig;
+    case 'quiverquant':
+      return quiverquantConfig;
     default:
       throw new Error(`Unknown retailer: ${retailer}`);
   }

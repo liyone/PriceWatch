@@ -4,7 +4,7 @@
 # Global alert settings - lowered for testing
 alerts:
   min_discount_percent: 1  # Very low threshold to test alerts
-  discord_enabled: true
+  discord_enabled: false
   deduplication_hours: 24
 
 # Output settings
@@ -29,6 +29,16 @@ retailers:
   shoppers:
     enabled: false  # Disabled for MVP - single site first  
     products: []
+
+  quiverquant:
+    enabled: true
+    alert_on_new: true
+    products:
+      - name: "Nancy Pelosi Trading"
+        url: "https://www.quiverquant.com/congresstrading/politician/Nancy%20Pelosi-P000197"
+      - name: "Marjorie Taylor Greene Trading"
+        url: "https://www.quiverquant.com/congresstrading/politician/Marjorie%20Taylor%20Greene-G000596"
+        alert_threshold: 0
 
 # Example of how to add more products:
 # 

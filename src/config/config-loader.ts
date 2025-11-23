@@ -28,7 +28,8 @@ export function loadConfig(configPath: string = 'src/config/products.yaml'): Scr
       retailers: {
         petsmart: createRetailerConfig('petsmart', rawConfig.retailers?.petsmart),
         petvalu: createRetailerConfig('petvalu', rawConfig.retailers?.petvalu),
-        shoppers: createRetailerConfig('shoppers', rawConfig.retailers?.shoppers)
+        shoppers: createRetailerConfig('shoppers', rawConfig.retailers?.shoppers),
+        quiverquant: createRetailerConfig('quiverquant', rawConfig.retailers?.quiverquant)
       },
       alerts: {
         min_discount_percent: rawConfig.alerts?.min_discount_percent || 20,
@@ -71,7 +72,7 @@ export function loadConfig(configPath: string = 'src/config/products.yaml'): Scr
  * Create retailer configuration with validation
  */
 function createRetailerConfig(
-  retailerName: 'petsmart' | 'petvalu' | 'shoppers',
+  retailerName: 'petsmart' | 'petvalu' | 'shoppers' | 'quiverquant',
   rawRetailerConfig: any
 ): RetailerConfig {
   const siteConfig = getSiteConfig(retailerName);
@@ -86,7 +87,8 @@ function createRetailerConfig(
       size_filter: product.size_filter,
       alert_threshold: product.alert_threshold || 20
     })),
-    enabled: rawRetailerConfig?.enabled || false
+    enabled: rawRetailerConfig?.enabled || false,
+    alert_on_new: rawRetailerConfig?.alert_on_new
   };
 }
 
@@ -113,15 +115,15 @@ export function getProductUrlsForRetailer(
  * Get enabled retailers from configuration
  */
 export function getEnabledRetailers(config: ScrapingConfig): Array<{
-  name: 'petsmart' | 'petvalu' | 'shoppers';
+  name: 'petsmart' | 'petvalu' | 'shoppers' | 'quiverquant';
   config: RetailerConfig;
 }> {
-  const enabled: Array<{ name: 'petsmart' | 'petvalu' | 'shoppers'; config: RetailerConfig }> = [];
+  const enabled: Array<{ name: 'petsmart' | 'petvalu' | 'shoppers' | 'quiverquant'; config: RetailerConfig }> = [];
   
   for (const [name, retailerConfig] of Object.entries(config.retailers)) {
     if (retailerConfig.enabled) {
       enabled.push({
-        name: name as 'petsmart' | 'petvalu' | 'shoppers',
+        name: name as 'petsmart' | 'petvalu' | 'shoppers' | 'quiverquant',
         config: retailerConfig
       });
     }
@@ -195,7 +197,7 @@ export function loadAndValidateConfig(configPath?: string): ScrapingConfig {
  */
 export function getProductConfigByUrl(
   config: ScrapingConfig,
-  retailer: 'petsmart' | 'petvalu' | 'shoppers',
+  retailer: 'petsmart' | 'petvalu' | 'shoppers' | 'quiverquant',
   url: string
 ): ProductConfig | undefined {
   const retailerConfig = config.retailers[retailer];

@@ -4,7 +4,7 @@
 
 export interface Product {
   /** Retailer identifier */
-  retailer: 'petsmart' | 'petvalu' | 'shoppers';
+  retailer: 'petsmart' | 'petvalu' | 'shoppers' | 'quiverquant';
   /** Product title/name */
   title: string;
   /** Brand name if available */
@@ -23,6 +23,8 @@ export interface Product {
   product_url: string;
   /** Product image URL */
   image_url?: string;
+  /** Unique identifier for history tracking (optional) */
+  id?: string;
   /** Timestamp when data was scraped */
   scraped_at: string;
 }
@@ -79,6 +81,8 @@ export interface RetailerConfig {
   products: ProductConfig[];
   /** Whether this retailer is enabled */
   enabled: boolean;
+  /** Whether to alert on new items instead of price drops */
+  alert_on_new?: boolean;
 }
 
 export interface ScrapingConfig {
@@ -87,6 +91,7 @@ export interface ScrapingConfig {
     petsmart: RetailerConfig;
     petvalu: RetailerConfig;
     shoppers: RetailerConfig;
+    quiverquant: RetailerConfig;
   };
   /** Global alert settings */
   alerts: {

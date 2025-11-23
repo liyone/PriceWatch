@@ -6,8 +6,10 @@
 import { loadAndValidateConfig, getEnabledRetailers, getProductUrlsForRetailer } from './config/config-loader';
 import { loadEnvironmentConfig, isGitHubActions, isTestMode } from './config/environment';
 import { PetSmartScraper } from './scrapers/petsmart-scraper';
+import { QuiverQuantScraper } from './scrapers/quiverquant-scraper';
 import { writeProductsToCSV, getTodaysCSVPath } from './utils/csv';
 import { createDiscordAlert } from './alerts/discord';
+import { HistoryManager } from './utils/history-manager';
 import { logger } from './utils/logger';
 import { Product, ScrapingError, ScrapingResult } from './types';
 
@@ -101,6 +103,9 @@ export async function main(): Promise<ScrapingResult> {
           case 'shoppers':
             logger.warn(`${retailerName} scraper not implemented yet, skipping`);
             continue;
+          case 'quiverquant':
+            scraper = new QuiverQuantScraper();
+            break;
           default:
             logger.error(`Unknown retailer: ${retailerName}`);
             continue;
@@ -153,27 +158,70 @@ export async function main(): Promise<ScrapingResult> {
       logger.warn('No products extracted, skipping CSV generation');
     }
 
-    // Send deal alerts
-    if (discordAlert && allProducts.length > 0) {
-      try {
-        logger.info('🔔 Checking for deal alerts...');
-        const alertThreshold = envConfig.alertMinPercent || config.alerts.min_discount_percent;
-        const dealsFound = allProducts.filter(p => 
-          p.percent_off !== undefined && 
-          p.percent_off >= alertThreshold
-        ).length;
-
-        if (dealsFound > 0) {
-          await discordAlert.sendDealsAlert(allProducts, alertThreshold);
-          alertsSent = dealsFound;
-          logger.info(`🎉 Sent alerts for ${dealsFound} qualifying deals (${alertThreshold}%+ discount)`);
-        } else {
-          logger.info(`📭 No qualifying deals found for alerts (${alertThreshold}%+ discount threshold)`);
+    // Initialize HistoryManager
+    const historyManager = new HistoryManager(config.output.data_directory);
+    
+    // Group products by alert type and process history
+    const priceAlertProducts: Product[] = [];
+    const newTradeAlertProducts: Product[] = [];
+    
+    for (const product of allProducts) {
+      const retailerConfig = enabledRetailers.find(r => r.name === product.retailer)?.config;
+      
+      if (retailerConfig?.alert_on_new) {
+        // Check history for new items
+        if (product.id && !historyManager.hasSeen(product.id)) {
+          newTradeAlertProducts.push(product);
+          historyManager.markSeen(product.id);
         }
+      } else {
+        // Check price threshold
+        const alertThreshold = envConfig.alertMinPercent || config.alerts.min_discount_percent;
+        if (product.percent_off !== undefined && product.percent_off >= alertThreshold) {
+          priceAlertProducts.push(product);
+        }
+      }
+    }
+
+    // Save history if updated
+    historyManager.save();
+
+    // Send alerts if enabled
+    if (discordAlert) {
+      try {
+        logger.info('🔔 Checking for alerts...');
+
+        // Send Price Drop Alerts
+        if (priceAlertProducts.length > 0) {
+          const alertThreshold = envConfig.alertMinPercent || config.alerts.min_discount_percent;
+          await discordAlert.sendDealsAlert(priceAlertProducts, alertThreshold);
+          alertsSent += priceAlertProducts.length;
+          logger.info(`🎉 Sent price alerts for ${priceAlertProducts.length} deals`);
+        }
+
+        // Send New Trade Alerts
+        if (newTradeAlertProducts.length > 0) {
+          await discordAlert.sendDealsAlert(newTradeAlertProducts, 0); 
+          alertsSent += newTradeAlertProducts.length;
+          logger.info(`🚨 Sent new trade alerts for ${newTradeAlertProducts.length} items`);
+        }
+        
+        if (priceAlertProducts.length === 0 && newTradeAlertProducts.length === 0) {
+          logger.info('📭 No qualifying alerts found');
+        }
+
       } catch (alertError) {
-        logger.error('Failed to send deal alerts', {
+        logger.error('Failed to send alerts', {
           error: alertError instanceof Error ? alertError.message : String(alertError)
         });
+      }
+    } else {
+      // Log what would have been alerted
+      if (priceAlertProducts.length > 0) {
+        logger.info(`🔔 [Dry Run] Would send price alerts for ${priceAlertProducts.length} deals`);
+      }
+      if (newTradeAlertProducts.length > 0) {
+        logger.info(`🚨 [Dry Run] Would send new trade alerts for ${newTradeAlertProducts.length} items`);
       }
     }
 

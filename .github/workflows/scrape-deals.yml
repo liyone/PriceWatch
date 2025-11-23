@@ -217,8 +217,8 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "PriceWatch Bot"
         
-        # Add any new CSV files
-        git add data/*.csv data/.gitkeep 2>/dev/null || true
+        # Add any new CSV files and history
+        git add data/*.csv data/history.json data/.gitkeep 2>/dev/null || true
         
         # Check if there are changes
         if git diff --staged --quiet; then
