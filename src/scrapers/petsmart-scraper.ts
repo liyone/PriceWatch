@@ -151,6 +151,8 @@ export class PetSmartScraper extends BaseScraper {
         scraped_at: new Date().toISOString()
       };
 
+      this.validateProduct(product);
+
       return product;
 
     } catch (error) {
@@ -244,6 +246,8 @@ export class PetSmartScraper extends BaseScraper {
             image_url: imageUrl ? (imageUrl.startsWith('http') ? imageUrl : `${this.config.baseUrl}${imageUrl}`) : undefined,
             scraped_at: new Date().toISOString()
           };
+
+          this.validateProduct(product);
 
           products.push(product);
           logger.debug(`Extracted product: ${title}`, { price: product.current_price });

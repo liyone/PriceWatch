@@ -249,6 +249,23 @@ export abstract class BaseScraper {
   }
 
   /**
+   * Validate scraped product data
+   */
+  protected validateProduct(product: Product): void {
+    if (!product.title) {
+      throw new Error('Product title is missing');
+    }
+
+    if (product.current_price === undefined || product.current_price === null) {
+      // For QuiverQuant, price might be 0 or null if it's just a trade record, 
+      // but for retail scrapers, price is essential.
+      if (this.retailerName !== 'quiverquant') {
+        throw new Error('Product current price is missing');
+      }
+    }
+  }
+
+  /**
    * Clean up browser resources
    */
   async cleanup(): Promise<void> {

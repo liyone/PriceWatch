@@ -123,6 +123,16 @@ export async function main(): Promise<ScrapingResult> {
           errorsCount: result.errors.length
         });
 
+        // Check for critical errors and alert immediately
+        for (const error of result.errors) {
+          if (error.severity === 'critical' && discordAlert) {
+            await discordAlert.sendErrorAlert(error.message, { 
+              retailer: retailerName,
+              productUrl: error.product_url 
+            });
+          }
+        }
+
       } catch (retailerError) {
         const errorMessage = `Failed to process retailer ${retailerName}: ${retailerError instanceof Error ? retailerError.message : String(retailerError)}`;
         logger.error(errorMessage);
@@ -194,14 +204,14 @@ export async function main(): Promise<ScrapingResult> {
         // Send Price Drop Alerts
         if (priceAlertProducts.length > 0) {
           const alertThreshold = envConfig.alertMinPercent || config.alerts.min_discount_percent;
-          await discordAlert.sendDealsAlert(priceAlertProducts, alertThreshold);
+          await discordAlert.sendDealsAlert(priceAlertProducts, alertThreshold, 'price_drop');
           alertsSent += priceAlertProducts.length;
           logger.info(`🎉 Sent price alerts for ${priceAlertProducts.length} deals`);
         }
 
         // Send New Trade Alerts
         if (newTradeAlertProducts.length > 0) {
-          await discordAlert.sendDealsAlert(newTradeAlertProducts, 0); 
+          await discordAlert.sendDealsAlert(newTradeAlertProducts, 0, 'new_item'); 
           alertsSent += newTradeAlertProducts.length;
           logger.info(`🚨 Sent new trade alerts for ${newTradeAlertProducts.length} items`);
         }

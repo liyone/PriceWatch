@@ -47,19 +47,26 @@ export class DiscordAlert {
   }
 
   /**
-   * Send alert for products with qualifying discounts
+   * Send alert for products with qualifying discounts or new items
    */
-  async sendDealsAlert(products: Product[], minDiscountPercent: number = 20): Promise<void> {
+  async sendDealsAlert(products: Product[], minDiscountPercent: number = 20, alertType: 'price_drop' | 'new_item' = 'price_drop'): Promise<void> {
     try {
-      const qualifyingDeals = products.filter(product => 
-        product.percent_off !== undefined && 
-        product.percent_off >= minDiscountPercent
-      );
+      // Filter based on alert type
+      let qualifyingDeals = products;
+      
+      if (alertType === 'price_drop') {
+        qualifyingDeals = products.filter(product => 
+          product.percent_off !== undefined && 
+          product.percent_off >= minDiscountPercent
+        );
+      }
+      // For new_item, we assume the caller has already filtered for new items
 
       if (qualifyingDeals.length === 0) {
         logger.debug('No qualifying deals found for Discord alert', {
           totalProducts: products.length,
-          minDiscountPercent
+          minDiscountPercent,
+          alertType
         });
         return;
       }
@@ -85,7 +92,7 @@ export class DiscordAlert {
       for (let i = 0; i < batches.length; i++) {
         const batch = batches[i];
         const isFirstBatch = i === 0;
-        const message = this.createDealsMessage(batch, isFirstBatch, batches.length > 1 ? i + 1 : undefined);
+        const message = this.createDealsMessage(batch, isFirstBatch, alertType, batches.length > 1 ? i + 1 : undefined);
         
         await this.sendMessage(message);
         
@@ -208,81 +215,123 @@ export class DiscordAlert {
   /**
    * Create rich message for deals
    */
-  private createDealsMessage(deals: Product[], isFirstBatch: boolean, batchNumber?: number): DiscordMessage {
+  private createDealsMessage(deals: Product[], isFirstBatch: boolean, alertType: 'price_drop' | 'new_item', batchNumber?: number): DiscordMessage {
     const embeds: DiscordEmbed[] = deals.map(deal => {
-      const embed: DiscordEmbed = {
-        title: `🏷️ ${deal.title}`,
-        color: this.getDiscountColor(deal.percent_off || 0),
-        fields: [
-          {
-            name: '💰 Current Price',
-            value: `$${deal.current_price?.toFixed(2)}`,
-            inline: true
+      if (alertType === 'new_item') {
+        // Trade/New Item Alert Format
+        const embed: DiscordEmbed = {
+          title: `📢 ${deal.title}`,
+          color: 0x5865F2, // Blurple (Discord color) for info/trades
+          fields: [
+            {
+              name: '🏪 Source',
+              value: deal.retailer.charAt(0).toUpperCase() + deal.retailer.slice(1),
+              inline: true
+            }
+          ],
+          footer: {
+            text: 'PriceWatch Trade Alert'
           },
-          {
-            name: '🏪 Retailer',
-            value: deal.retailer.charAt(0).toUpperCase() + deal.retailer.slice(1),
-            inline: true
-          }
-        ],
-        footer: {
-          text: 'PriceWatch Deal Alert'
-        },
-        timestamp: deal.scraped_at,
-        url: deal.product_url
-      };
-
-      // Add regular price and discount if available
-      if (deal.regular_price && deal.percent_off) {
-        embed.fields?.splice(1, 0, {
-          name: '🔥 Discount',
-          value: `${deal.percent_off}% OFF`,
-          inline: true
-        });
-        
-        embed.fields?.push({
-          name: '📉 Was',
-          value: `$${deal.regular_price.toFixed(2)}`,
-          inline: true
-        });
-        
-        embed.description = `**Save $${(deal.regular_price - deal.current_price!).toFixed(2)}**`;
-      }
-
-      // Add brand and size if available
-      if (deal.brand) {
-        embed.fields?.push({
-          name: '🏭 Brand',
-          value: deal.brand,
-          inline: true
-        });
-      }
-
-      if (deal.size_text) {
-        embed.fields?.push({
-          name: '📏 Size',
-          value: deal.size_text,
-          inline: true
-        });
-      }
-
-      // Add promo text if available
-      if (deal.promo_text) {
-        embed.fields?.push({
-          name: '🎁 Promotion',
-          value: deal.promo_text,
-          inline: false
-        });
-      }
-
-      // Add thumbnail if image available
-      if (deal.image_url) {
-        embed.thumbnail = {
-          url: deal.image_url
+          timestamp: deal.scraped_at,
+          url: deal.product_url
         };
-      }
 
-      return embed;
+        // Add size/amount if available (often used for trade amount)
+        if (deal.size_text) {
+          embed.fields?.push({
+            name: '📊 Amount/Size',
+            value: deal.size_text,
+            inline: true
+          });
+        }
+
+        // Add promo text (often used for transaction type)
+        if (deal.promo_text) {
+          embed.fields?.push({
+            name: '📝 Type',
+            value: deal.promo_text,
+            inline: true
+          });
+        }
+
+        return embed;
+
+      } else {
+        // Price Drop Alert Format (Original)
+        const embed: DiscordEmbed = {
+          title: `🏷️ ${deal.title}`,
+          color: this.getDiscountColor(deal.percent_off || 0),
+          fields: [
+            {
+              name: '💰 Current Price',
+              value: `$${deal.current_price?.toFixed(2)}`,
+              inline: true
+            },
+            {
+              name: '🏪 Retailer',
+              value: deal.retailer.charAt(0).toUpperCase() + deal.retailer.slice(1),
+              inline: true
+            }
+          ],
+          footer: {
+            text: 'PriceWatch Deal Alert'
+          },
+          timestamp: deal.scraped_at,
+          url: deal.product_url
+        };
+
+        // Add regular price and discount if available
+        if (deal.regular_price && deal.percent_off) {
+          embed.fields?.splice(1, 0, {
+            name: '🔥 Discount',
+            value: `${deal.percent_off}% OFF`,
+            inline: true
+          });
+          
+          embed.fields?.push({
+            name: '📉 Was',
+            value: `$${deal.regular_price.toFixed(2)}`,
+            inline: true
+          });
+          
+          embed.description = `**Save $${(deal.regular_price - deal.current_price!).toFixed(2)}**`;
+        }
+
+        // Add brand and size if available
+        if (deal.brand) {
+          embed.fields?.push({
+            name: '🏭 Brand',
+            value: deal.brand,
+            inline: true
+          });
+        }
+
+        if (deal.size_text) {
+          embed.fields?.push({
+            name: '📏 Size',
+            value: deal.size_text,
+            inline: true
+          });
+        }
+
+        // Add promo text if available
+        if (deal.promo_text) {
+          embed.fields?.push({
+            name: '🎁 Promotion',
+            value: deal.promo_text,
+            inline: false
+          });
+        }
+
+        // Add thumbnail if image available
+        if (deal.image_url) {
+          embed.thumbnail = {
+            url: deal.image_url
+          };
+        }
+
+        return embed;
+      }
     });
 
     const message: DiscordMessage = {
@@ -292,10 +341,14 @@ export class DiscordAlert {
     // Add header message for first batch
     if (isFirstBatch) {
       const dealCount = deals.length;
-      const emojis = ['🎉', '💰', '🔥', '⚡'];
-      const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
       
-      message.content = `${randomEmoji} **New Deal${dealCount > 1 ? 's' : ''} Alert!** Found ${dealCount} qualifying deal${dealCount > 1 ? 's' : ''}`;
+      if (alertType === 'new_item') {
+        message.content = `🚨 **New Activity Alert!** Detected ${dealCount} new item${dealCount > 1 ? 's' : ''}`;
+      } else {
+        const emojis = ['🎉', '💰', '🔥', '⚡'];
+        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+        message.content = `${randomEmoji} **New Deal${dealCount > 1 ? 's' : ''} Alert!** Found ${dealCount} qualifying deal${dealCount > 1 ? 's' : ''}`;
+      }
       
       if (batchNumber) {
         message.content += ` (Batch ${batchNumber})`;

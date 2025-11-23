@@ -143,6 +143,8 @@ export class QuiverQuantScraper extends BaseScraper {
             scraped_at: new Date().toISOString()
           };
 
+          this.validateProduct(product);
+
           products.push(product);
           
           // Advance by 6 (size of a row)
