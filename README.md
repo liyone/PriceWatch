@@ -44,6 +44,17 @@ retailers:
         url: "https://..."
 ```
 
+### Schedule and Costs
+
+The scraper is configured to run **every 6 hours** (4 times/day) via GitHub Actions.
+
+- **Frequency**: 00:00, 06:00, 12:00, 18:00 UTC.
+- **Resource Usage**:
+  - Approx. 1-2 minutes per run.
+  - ~4 runs/day * 30 days = **~120-240 minutes/month**.
+  - **GitHub Free Tier**: Includes 2,000 minutes/month.
+  - **Conclusion**: This setup uses ~10% of the free tier, leaving plenty of room for other projects.
+
 ### Alert Logic
 
 The system distinguishes between two types of alerts based on `alert_on_new`:

@@ -21,8 +21,8 @@ retailers:
       - name: "Authority Everyday Health Adult Cat Wet Food - 5.5 Oz"
         url: "https://www.petsmart.ca/cat/food-and-treats/wet-food/authority-everyday-health-adult-cat-wet-food---55-oz-flaked-in-gravy-51010.html"
         alert_threshold: 1
-      - name: "Natural Balance Limited Ingredient Wet Cat Food - Pate, 3 oz."
-        url: "https://www.petsmart.ca/cat/food-and-treats/wet-food/natural-balance-limited-ingredient-wet-cat-food---pate-3-oz-5366369.html"
+      - name: "Natural Balance Limited Ingredient Wet Cat Food - Pate, 5.5 oz."
+        url: "https://www.petsmart.ca/cat/food-and-treats/wet-food/natural-balance-limited-ingredient-diets-cat-food---grain-free-chicken-and-green-pea-30327.html"
         alert_threshold: 1
 
   petvalu:

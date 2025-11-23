@@ -19,10 +19,10 @@ export const petsmartConfig: SiteConfig = {
     title: 'h1, .pdp-product-name, .product-title, .product-name, h3 a, .tile-title',
     
     // Price selectors - enhanced for PetSmart's pricing structure
-    currentPrice: '.price, .product-price, .price-current, .sale-price, .price-now, .price .value, [data-price], .current-price',
+    currentPrice: '.sparky-c-price--sale, .price, .product-price, .price-current, .sale-price, .price-now, .price .value, [data-price], .current-price',
     
     // Regular/original price (for sales) - includes struck-through prices
-    regularPrice: '.price-original, .price-was, .price-reg, .price-standard, .was-price, .strike-through, .crossed-out, .original-price, .regular-price, .msrp',
+    regularPrice: '.sparky-c-price--disabled, .price-original, .price-was, .price-reg, .price-standard, .was-price, .strike-through, .crossed-out, .original-price, .regular-price, .msrp',
     
     // Product link (for category pages)
     productLink: 'a[href*="/product/"], a[href*="petsmart.ca"], .product-link, .tile-link',

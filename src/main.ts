@@ -225,8 +225,8 @@ export async function main(): Promise<ScrapingResult> {
       }
     }
 
-    // Send summary alert
-    if (discordAlert) {
+    // Send summary alert only if there are deals or errors
+    if (discordAlert && (alertsSent > 0 || allErrors.length > 0)) {
       try {
         const executionTime = Date.now() - startTime;
         const csvPath = getTodaysCSVPath(config.output.data_directory);
@@ -244,6 +244,8 @@ export async function main(): Promise<ScrapingResult> {
           error: alertError instanceof Error ? alertError.message : String(alertError)
         });
       }
+    } else if (discordAlert) {
+      logger.info('🔕 Skipping summary alert (no deals or errors)');
     }
 
     // Final summary

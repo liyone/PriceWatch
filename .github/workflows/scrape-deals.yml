@@ -1,14 +1,10 @@
 name: 🛒 Price Watch Deal Scraper
 
 on:
-  # Scheduled runs - 3 times daily
+  # Scheduled runs - Every 6 hours
   schedule:
-    # Run at 8:00 AM ET (12:00 UTC)
-    - cron: '0 12 * * *'
-    # Run at 2:00 PM ET (18:00 UTC) 
-    - cron: '0 18 * * *'
-    # Run at 8:00 PM ET (00:00 UTC next day)
-    - cron: '0 0 * * *'
+    # Run at 00:00, 06:00, 12:00, and 18:00 UTC
+    - cron: '0 */6 * * *'
   
   # Manual trigger (easily triggerable!)
   workflow_dispatch:
